@@ -103,6 +103,7 @@
         <div class="card-body">
           <h3 class="text-center">Create Account</h3>
           <form onsubmit="handleSignup(event)">
+            <input type="hidden" id="csrftoken" value="{{ csrf_token }}">
             <input type="email" name="email" class="form-control mb-3" placeholder="Email" required>
             <input type="password" name="password" class="form-control mb-3" placeholder="Password" required>
             <button type="submit" class="btn btn-success w-100" id="patientSignupBtn">Sign Up</button>
@@ -114,6 +115,115 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Receptionist Authentication -->
+<div id="receptionAuth" class="container mt-5 dashboard">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="text-center">Receptionist Login</h3>
+          <div class="alert alert-warning text-center mb-3">
+            Only authorized personnel can access
+          </div>
+          <form onsubmit="handleReceptionLogin(event)">
+            <div class="mb-3">
+              <label for="receptionPasskey" class="form-label">Enter Passkey</label>
+              <input type="password" id="receptionPasskey" class="form-control" maxlength="4" required>
+              <div id="passkeyError" class="text-danger mt-1" style="display: none;">Incorrect passkey. Please try again.</div>
+            </div>
+            <div id="receptionCredentials" style="display: none;">
+              <div class="mb-3">
+                <label for="receptionUser" class="form-label">Username</label>
+                <input type="text" id="receptionUser" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="receptionPass" class="form-label">Password</label>
+                <input type="password" id="receptionPass" class="form-control" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100" id="receptionLoginBtn">Login</button>
+          </form>
+          <div class="text-center mt-3">
+            <a href="#" onclick="showSection('introPage')" class="btn btn-outline-secondary">Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add Appointment Modal -->
+<div class="modal" tabindex="-1" id="addAppointmentModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Appointment</h5>
+        <button type="button" class="btn-close" onclick="closeAddAppointmentModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addAppointmentForm">
+          <div class="mb-2">
+            <label class="form-label">Patient Email (existing or new)</label>
+            <input type="email" id="modalPatientEmail" autocomplete="email" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Service</label>
+            <select id="modalServiceType" class="form-select" required>
+              <option value="">Select Service</option>
+              <option>General Checkup</option>
+              <option>Eye Care</option>
+              <option>Dental Care</option>
+              <option>Blood test</option>
+              <option>Diabetes test</option>
+              <option>X-ray</option>
+              <option>PT scan</option>
+              <option>Vaccination</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Date</label>
+            <input type="date" id="modalAppointmentDate" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Time</label>
+            <select id="modalAppointmentTime" class="form-select w-50" required>
+              <option value="">Select Time</option>
+              <option value="09:00">9 AM</option>
+              <option value="10:00">10 AM</option>
+              <option value="11:00">11 AM</option>
+              <option value="12:00">12 PM</option>
+              <option value="14:00">2 PM</option>
+              <option value="15:00">3 PM</option>
+              <option value="16:00">4 PM</option>
+              <option value="17:00">5 PM</option>
+              <option value="18:00">6 PM</option>
+              <option value="19:00">7 PM</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success">Book Appointment</button>
+        </form>
+        <div id="addAppointmentStatus" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Receptionist Dashboard -->
+<div id="receptionDashboard" class="container mt-5 dashboard" style="display:none;">
+  <h2>Appointment Management</h2>
+  <div class="mb-3 d-flex justify-content-between align-items-center">
+    <div>
+      <button type="button" class="btn btn-primary" onclick="showAddAppointmentModal()">+ Add Appointment</button>
+    </div>
+    <div id="calendarContainer"></div>
+  </div>
+  <div id="receptionistNotifications" class="mt-4">
+    <h4>Notifications</h4>
+    <div id="notificationsList"></div>
+    <button onclick="clearReceptionistNotifications()" class="btn btn-danger mt-3">Clear Notifications</button>
+  </div>  
+  <div id="appointmentsList" class="mt-4"></div>
 </div>
 
 <!-- Patient Dashboard -->
@@ -130,18 +240,18 @@
     </div>
 </div>
 
-  <!-- Profile Section -->
-  <div class="card">
-    <div class="card-body">
-      <h4>Personal Details</h4>
+<!-- Profile Section -->
+<div class="card">
+  <div class="card-body">
+    <h4>Personal Details</h4>
       <form onsubmit="saveProfile(event)">
         <div class="row g-3">
-            <div class="col-md-3">
-                <input type="text" id="firstName" class="form-control " placeholder="First Name" required>
-            </div>
-            <div class="col-md-3">
-                <input type="text" id="lastName" class="form-control" placeholder="Last Name" required>
-            </div> 
+          <div class="col-md-3">
+            <input type="text" id="firstName" autocomplete="given-name"class="form-control " placeholder="First Name" required>
+          </div>
+          <div class="col-md-3">
+              <input type="text" id="lastName" autocomplete="family-name" class="form-control" placeholder="Last Name" required>
+          </div> 
           <div class="col-md-3">
             <input type="number" id="age" class="form-control" placeholder="Age" required>
           </div>
@@ -155,31 +265,32 @@
             <input type="tel" id="mobile" class="form-control w-50" placeholder="Mobile Number" required>
           </div>
           <div class="col-12">
-            <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Profile</button>
+             <button type="button" id="editProfileBtn" onclick="enableProfileEditing()">Edit Profile</button>
+              <button type="submit" id="saveProfileBtn" disabled>Save Profile</button>
           </div>
         </div>
       </form>
-    </div>
   </div>
-    <!-- Upload Past Medical Records -->
-    <div class="card mt-4">
-      <div class="card-body">
-        <h4>Upload Your Past Medical Records</h4>
-        <form id="medicalRecordForm">
-          <div class="mb-3">
-            <input type="file" id="medicalRecordFile" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
-            <div class="form-text">Max file size: 1MB. Accepted formats: PDF, JPG, PNG, DOC, DOCX.</div>
-          </div>
-          <button type="submit" class="btn btn-primary">Upload</button>
-          <div id="uploadStatus" class="mt-2"></div>
-        </form>
-      </div>
-    </div>
-  
+</div>
 
-  <!-- Appointment Booking -->
-  <div class="card mt-4">
-    <div class="card-body">
+<!-- Upload Past Medical Records -->
+<div class="card mt-4">
+  <div class="card-body">
+    <h4>Upload Your Past Medical Records</h4>
+    <form id="medicalRecordForm" enctype="multipart/form-data">
+      <div class="mb-3">
+        <input type="file" id="medicalRecordFile" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
+        <div class="form-text">Max file size: 1MB. Accepted formats: PDF, JPG, PNG, DOC, DOCX.</div>
+      </div>
+      <button type="submit" class="btn btn-primary">Upload</button>
+      <div id="uploadStatus" class="mt-2"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Appointment Booking -->
+<div class="card mt-4">
+  <div class="card-body">
       <h4>Book Appointment</h4>
       <form onsubmit="bookAppointment(event)">
         <div class="row g-3">
@@ -205,19 +316,32 @@
             <input type="date" id="appointmentDate" class="form-control w-50" required>
           </div>
           <div class="mb-3">
-            <input type="time" id="appointmentTime" class="form-control w-50" required>
+            <select id="appointmentTime" class="form-select w-50" required>
+              <option value="">Select Time</option>
+              <option value="09:00">9 AM</option>
+              <option value="10:00">10 AM</option>
+              <option value="11:00">11 AM</option>
+              <option value="12:00">12 PM</option>
+              <option value="14:00">2 PM</option>
+              <option value="15:00">3 PM</option>
+              <option value="16:00">4 PM</option>
+              <option value="17:00">5 PM</option>
+              <option value="18:00">6 PM</option>
+              <option value="19:00">7 PM</option>
+            </select>
           </div>
           <div class="text-center">
             <button type="submit" class="btn btn-success w-30">Book Appointment</button>
           </div>
         </div>
       </form>
-    </div>
   </div>
+</div>
 
-  <!-- Pharmacy Section (inside dashboard) -->
-  <div id="pharmacySection" class="card mt-4">
-    <div class="card-body">
+
+<!-- Pharmacy Section (inside dashboard) -->
+<div id="pharmacySection" class="card mt-4">
+  <div class="card-body">
       <h4>Pharmacy</h4>
       <form id="pharmacyForm">
         <div class="mb-3">
@@ -276,96 +400,6 @@
 </div>
 
 
-
-<!-- Receptionist Login -->
-<div id="receptionAuth" class="container mt-5 dashboard">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h3 class="text-center">Receptionist Login</h3>
-          <div class="alert alert-warning text-center mb-3">
-            Only authorized person can access
-          </div>
-          <form id="receptionLoginForm" onsubmit="handleReceptionLogin(event)">
-            <input type="password" id="receptionPasskey" class="form-control mb-3" placeholder="Enter Passkey" maxlength="4" required>
-            <div id="receptionCredentials" style="display:none;">
-              <input type="text" id="receptionUser" class="form-control mb-3" placeholder="Username" required>
-              <input type="password" id="receptionPass" class="form-control mb-3" placeholder="Password" required>
-              <button type="submit" class="btn btn-secondary w-100" id="receptionLoginBtn">Login</button>
-            </div>
-            <div id="passkeyError" class="text-danger text-center mb-2" style="display:none;">Invalid passkey. Please try again.</div>
-          </form>
-          <p class="text-center mt-3">
-            <a href="#" onclick="showSection('introPage')">Back to Home</a>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Receptionist Dashboard -->
-<div id="receptionDashboard" class="container mt-5 dashboard">
-  <h2>Appointment Management</h2>
-  <div class="mb-3 d-flex justify-content-between align-items-center">
-    <div>
-      <button class="btn btn-primary" onclick="showAddAppointmentModal()">+ Add Appointment</button>
-    </div>
-    <div id="calendarContainer"></div>
-  </div>
-  <div id="receptionistNotifications" class="mt-4">
-    <h4>Notifications</h4>
-    <div id="notificationsList"></div>
-    <button onclick="clearReceptionistNotifications()" class="btn btn-danger mt-3">Clear Notifications</button>
-  </div>  
-  <div id="appointmentsList" class="mt-4"></div>
-</div>
-
-<!-- Add Appointment Modal -->
-<div class="modal" tabindex="-1" id="addAppointmentModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add New Appointment</h5>
-        <button type="button" class="btn-close" onclick="closeAddAppointmentModal()"></button>
-      </div>
-      <div class="modal-body">
-        <form id="addAppointmentForm">
-          <div class="mb-2">
-            <label class="form-label">Patient Email (existing or new)</label>
-            <input type="email" id="modalPatientEmail" class="form-control" required>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Service</label>
-            <select id="modalServiceType" class="form-select" required>
-              <option value="">Select Service</option>
-              <option>General Checkup</option>
-              <option>Eye Care</option>
-              <option>Dental Care</option>
-              <option>Blood test</option>
-              <option>Diabetes test</option>
-              <option>X-ray</option>
-              <option>PT scan</option>
-              <option>Vaccination</option>
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Date</label>
-            <input type="date" id="modalAppointmentDate" class="form-control" required>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Time</label>
-            <input type="time" id="modalAppointmentTime" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-success">Book Appointment</button>
-        </form>
-        <div id="addAppointmentStatus" class="mt-2"></div>
-      </div>
-    </div>
-  </div>
-</div>
 <!-- Ambulance Booking Section -->
 <div class="container mt-5">
   <div class="card">
@@ -401,13 +435,58 @@
 </footer>
 
 <script>
-
-// Show section
-function showSection(sectionId) {
-  document.querySelectorAll('.dashboard').forEach(div => div.style.display = 'none');
-  document.getElementById(sectionId).style.display = 'block';
+let calendarYear = (new Date()).getFullYear();
+let calendarMonth = (new Date()).getMonth();
+let receptionistSelectedDate = null;
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+function showSection(sectionId) {
+  // Hide all dashboards
+  document.querySelectorAll('.dashboard').forEach(div => div.style.display = 'none');
+  // Show the requested section
+  const section = document.getElementById(sectionId);
+  if (section) {
+    section.style.display = 'block';
+  } else {
+    console.error("Section not found:", sectionId);
+  }
 
+  // Extra logic for dashboards
+  if (sectionId === 'patientDashboard') {
+    showPatientNotification();
+    loadPatientAppointments();
+  }
+  if (sectionId === 'receptionDashboard') {
+    renderReceptionistAppointments();
+    renderCalendar(receptionistSelectedDate);
+  }
+}
 // Clear existing user data for a fresh start
 localStorage.removeItem('patients');
 localStorage.removeItem('currentPatient');
@@ -417,173 +496,319 @@ sessionStorage.removeItem('currentPatientId');
 let patients = [];
 let appointments = [];
 let doctorAssignments = {};
-const RECEPTION_CREDENTIALS = { username: 'admin', password: 'admin123' };
 
-async function handleSignup(e) {
-  e.preventDefault();
+async function handleSignup(event) {
+  event.preventDefault();
   const signupBtn = document.getElementById('patientSignupBtn');
   signupBtn.disabled = true;
-  const oldText = signupBtn.innerHTML;
   signupBtn.innerHTML = `<span class='spinner-border spinner-border-sm'></span> Signing up...`;
-  
-  const formData = new FormData(e.target);
+
+  const formData = new FormData(event.target);
   const email = formData.get('email').trim();
   const password = formData.get('password');
-  
-  if (!email || !password) {
-    signupBtn.disabled = false;
-    signupBtn.innerHTML = 'Sign Up';
-    alert('Please fill in all required fields');
-    return;
-  }
-  
+
   try {
-    // Get fresh copy of patients from localStorage
-    let patients = JSON.parse(localStorage.getItem('patients') || '[]');
-    
-    // Check if user already exists (case-insensitive check)
-    const existingUser = patients.find(patient => patient.email.toLowerCase() === email.toLowerCase());
-    if (existingUser) {
-      throw new Error('An account with this email already exists. Please login instead.');
+    const csrftoken = getCookie('csrftoken');
+    const response = await fetch('/api/register/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json','X-CSRFToken': csrftoken },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(Object.values(errorData).flat().join(' '));
     }
-    
-    // Create complete user object
-    const newUser = {
-      id: 'patient_' + Date.now().toString(),
-      email: email.toLowerCase(), // Store email in lowercase
-      password, // In a real app, this should be hashed
-      name: '',
-      phone: '',
-      address: '',
-      appointments: [],
-      email_confirmed: true,
-      createdAt: new Date().toISOString()
-    };
-    
-    // Add to patients array and save to localStorage
-    patients.push(newUser);
-    localStorage.setItem('patients', JSON.stringify(patients));
-    
-    // Show success message
-    alert('Registration successful! You can now log in with your credentials.');
-    
-    // Reset form and go to login page
-    e.target.reset();
-    showSection('patientAuth');
-    
-  } catch (err) {
-    alert(err.message || 'Error during registration. Please try again.');
-    console.error('Signup error:', err);
+
+    const data = await response.json();
+    alert(data.message || 'Registration successful! Please check your email to verify your account.');
+    event.target.reset();
+    showSection('patientAuth'); // Navigate to login page
+
+  } catch (error) {
+    alert('Error: ' + error.message);
   } finally {
     signupBtn.disabled = false;
     signupBtn.innerHTML = 'Sign Up';
   }
 }
-function clearReceptionistNotifications() {
-  localStorage.removeItem('receptionistNotifications');
-  document.getElementById('notificationsList').innerHTML = '<p>No notifications.</p>';
-}
-async function handlePatientLogin(e) {
-  e.preventDefault();
+async function handlePatientLogin(event) {
+  event.preventDefault();
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
   const loginBtn = document.getElementById('patientLoginBtn');
   loginBtn.disabled = true;
-  const oldText = loginBtn.innerHTML;
-  loginBtn.innerHTML = `<span class='spinner-border spinner-border-sm'></span> Logging in...`;
-  
+  loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Logging in...';
   try {
-    // Get fresh copy of patients from localStorage
-    const patients = JSON.parse(localStorage.getItem('patients') || '[]');
-    
-    // Find user in the patients array
-    const patient = patients.find(p => p.email === email && p.password === password);
-    
-    if (!patient) {
-      throw new Error('Invalid email or password');
+    const csrftoken = getCookie('csrftoken');
+    const response = await fetch('/api/login/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Login failed');
     }
-    
-    // In demo, we're automatically confirming emails on signup
-    // So we'll just set it to true if it's not set
-    if (patient.email_confirmed === undefined) {
-      patient.email_confirmed = true;
-      // Update the patient record
-      const updatedPatients = patients.map(p => p.id === patient.id ? patient : p);
-      localStorage.setItem('patients', JSON.stringify(updatedPatients));
-    }
-    
-    // Store the logged-in user's data
-    const userData = {
-      id: patient.id,
-      email: patient.email,
-      profile: {
-        name: patient.name || '',
-        phone: patient.phone || '',
-        address: patient.address || ''
-      }
-    };
-    
-    localStorage.setItem('currentPatient', JSON.stringify(userData));
-    sessionStorage.setItem('currentPatientId', patient.id);
-    
-    // Show the patient dashboard
+    const data = await response.json();
+    // Save minimal user info like email or token if needed
+    localStorage.setItem('currentPatient', JSON.stringify(data));
+
+    // Show patient dashboard
     showSection('patientDashboard');
-    
-    // Load the patient's profile and appointments
-    loadProfile();
+
+    // Fetch profile from backend, then load profile UI
+    await fetchPatientProfile(email);
+
+    // Load any additional data like appointments
     loadPatientAppointments();
-    
-    // Clear the login form
-    e.target.reset();
-  } catch (err) {
-    alert(err.message || 'An error occurred during login. Please try again.');
-    console.error('Login error:', err);
+
+    event.target.reset();
+  } catch (error) {
+      if (error.message === 'User not found'){
+         alert('No account exists for this email. Please create a new account first using the Sign Up option.');
+      } else{
+        alert('Error: ' + error.message);
+      }
   } finally {
     loginBtn.disabled = false;
-    loginBtn.innerHTML = oldText;
+    loginBtn.innerHTML = 'Login';
+  }
+}
+function populateProfileForm(profile) {
+  document.getElementById('firstName').value = profile.first_name || '';
+  document.getElementById('lastName').value = profile.last_name || '';
+  document.getElementById('age').value = profile.age || '';
+  document.getElementById('bloodGroup').value = profile.blood_group || '';
+  document.getElementById('mobile').value = profile.mobile || '';
+
+  // If profile exists, make inputs readonly and enable edit button
+  if (profile.first_name || profile.last_name) {
+    setProfileFieldsReadonly(true);
+    document.getElementById('saveProfileBtn').disabled = true;
+    document.getElementById('editProfileBtn').disabled = false;
+  } else {
+    // New or empty profile, inputs editable and save enabled
+    setProfileFieldsReadonly(false);
+    document.getElementById('saveProfileBtn').disabled = false;
+    document.getElementById('editProfileBtn').disabled = true;
+  }
+}
+
+async function fetchPatientProfile(email) {
+  const csrftoken = getCookie('csrftoken');
+  try {
+    const response = await fetch('/api/get-profile/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify({ email: email }),
+    });
+
+    if (response.ok) {
+      const profile = await response.json();
+      // Call a function to populate your profile form inputs with this data
+      populateProfileForm(profile);
+    } else {
+      // No profile found â€” keep profile inputs empty and editable
+      setProfileFieldsReadonly(false);
+      document.getElementById('saveProfileBtn').disabled = false;
+      document.getElementById('editProfileBtn').disabled = true;
+    }
+  } catch (error) {
+    alert('Failed to load profile: ' + error.message);
   }
 }
 
 function loadProfile() {
-    // Load from patients array if exists
-    const current = JSON.parse(localStorage.getItem('currentPatient'));
-    let patientsArr = JSON.parse(localStorage.getItem('patients')) || [];
-    let found = patientsArr.find(p => p.email === current.email);
-    let patient = found ? found : current;
-    // Sync currentPatient with latest profile
-    localStorage.setItem('currentPatient', JSON.stringify(patient));
-    // Fill profile fields
-    if (patient.profile) {
-        document.getElementById('firstName').value = patient.profile.firstName || '';
-        document.getElementById('lastName').value = patient.profile.lastName || '';
-        document.getElementById('age').value = patient.profile.age || '';
-        document.getElementById('bloodGroup').value = patient.profile.bloodGroup || '';
-        document.getElementById('mobile').value = patient.profile.mobile || '';
-    } else {
-        document.getElementById('firstName').value = '';
-        document.getElementById('lastName').value = '';
-        document.getElementById('age').value = '';
-        document.getElementById('bloodGroup').value = '';
-        document.getElementById('mobile').value = '';
-    }
-    // Make fields editable by default
+  // Load current patient and patients array from localStorage
+  const current = JSON.parse(localStorage.getItem('currentPatient'));
+  let patientsArr = JSON.parse(localStorage.getItem('patients')) || [];
+  let found = patientsArr.find(p => p.email === current.email);
+  let patient = found ? found : current;
+
+  // Sync localStorage currentPatient with latest patient info
+  localStorage.setItem('currentPatient', JSON.stringify(patient));
+
+  // Fill profile form fields if profile exists
+  if (patient.profile) {
+    document.getElementById('firstName').value = patient.profile.firstName || '';
+    document.getElementById('lastName').value = patient.profile.lastName || '';
+    document.getElementById('age').value = patient.profile.age || '';
+    document.getElementById('bloodGroup').value = patient.profile.bloodGroup || '';
+    document.getElementById('mobile').value = patient.profile.mobile || '';
+
+    // Disable editing by default if profile exists
+    setProfileFieldsReadonly(true);
+    document.getElementById('saveProfileBtn').disabled = true;
+    document.getElementById('editProfileBtn').disabled = false;
+  } else {
+    // No profile yet - enable inputs for entering data
+    document.getElementById('firstName').value = '';
+    document.getElementById('lastName').value = '';
+    document.getElementById('age').value = '';
+    document.getElementById('bloodGroup').value = '';
+    document.getElementById('mobile').value = '';
+
     setProfileFieldsReadonly(false);
     document.getElementById('saveProfileBtn').disabled = false;
-    // Load updated notification from the patient record
-    if (patient && patient.notification) {
-      const noteDiv = document.getElementById('notification');
-      noteDiv.innerText = patient.notification;
-      noteDiv.style.display = 'block';
-      // Clear the notification after showing
-      delete patient.notification;
-      patientsArr = patientsArr.map(p => p.email === patient.email ? patient : p);
-      localStorage.setItem('patients', JSON.stringify(patientsArr));
-      localStorage.setItem('currentPatient', JSON.stringify(patient));
-    } else {
-      document.getElementById('notification').style.display = 'none';
-    }
-    loadPatientAppointments();
+    document.getElementById('editProfileBtn').disabled = true;
+  }
+
+  // Show notification if exists
+  if (patient && patient.notification) {
+    const noteDiv = document.getElementById('notification');
+    noteDiv.innerText = patient.notification;
+    noteDiv.style.display = 'block';
+
+    // Clear notification after showing
+    delete patient.notification;
+    patientsArr = patientsArr.map(p => p.email === patient.email ? patient : p);
+    localStorage.setItem('patients', JSON.stringify(patientsArr));
+    localStorage.setItem('currentPatient', JSON.stringify(patient));
+  } else {
+    document.getElementById('notification').style.display = 'none';
+  }
+
+  // Load appointments for patient
+  loadPatientAppointments();
 }
+async function saveProfile(event) {
+  event.preventDefault();
+
+  const csrftoken = getCookie('csrftoken');
+  const email = JSON.parse(localStorage.getItem('currentPatient')).email;
+
+  const profileData = {
+    email: email,
+    first_name: document.getElementById('firstName').value.trim(),
+    last_name: document.getElementById('lastName').value.trim(),
+    age: parseInt(document.getElementById('age').value, 10),
+    blood_group: document.getElementById('bloodGroup').value,
+    mobile: document.getElementById('mobile').value.trim(),
+  };
+
+  try {
+    const response = await fetch('/api/update-profile/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify(profileData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      alert('Failed to save profile: ' + (errorData.error || 'Unknown error'));
+      return;
+    }
+
+    alert('Profile saved successfully!');
+
+    setProfileFieldsReadonly(true);
+    document.getElementById('saveProfileBtn').disabled = true;
+    document.getElementById('editProfileBtn').disabled = false;
+
+    const patient = JSON.parse(localStorage.getItem('currentPatient'));
+    patient.profile = {
+      firstName: profileData.first_name,
+      lastName: profileData.last_name,
+      age: profileData.age,
+      bloodGroup: profileData.blood_group,
+      mobile: profileData.mobile,
+    };
+    localStorage.setItem('currentPatient', JSON.stringify(patient));
+
+  } catch (error) {
+    alert('Error saving profile: ' + error.message);
+  }
+}
+
+// Enable editing â€” make form inputs editable, enable save button, disable edit button
+function enableProfileEditing() {
+  setProfileFieldsReadonly(false);
+  document.getElementById('saveProfileBtn').disabled = false;
+  document.getElementById('editProfileBtn').disabled = true;
+}
+
+// Make inputs readonly or editable based on argument
+function setProfileFieldsReadonly(readonly) {
+  ['firstName', 'lastName', 'age', 'bloodGroup', 'mobile'].forEach(id => {
+    const elem = document.getElementById(id);
+    if (elem.tagName.toLowerCase() === 'select') {
+      elem.disabled = readonly;  // disable/enable select properly
+    } else {
+      elem.readOnly = readonly;  // set readOnly for inputs/textareas
+    }
+  });
+}
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB in bytes
+async function uploadMedicalRecord(event) {
+  event.preventDefault();
+  const fileInput = document.getElementById('medicalRecordFile'); // Correct input ID
+  const file = fileInput.files[0];
+
+  if (!file) {
+    alert('Please select a file to upload.');
+    return;
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    alert('File size exceeds 1MB. Please select a smaller file or compress it.');
+    return;
+  }
+  const formData = new FormData();
+  formData.append('file', file);
+
+  // Get patient email from logged in user
+  const currentPatient = JSON.parse(localStorage.getItem('currentPatient'));
+  if (!currentPatient || !currentPatient.email) {
+    alert('User not logged in.');
+    return;
+  }
+  formData.append('email', currentPatient.email);
+
+  const csrftoken = getCookie('csrftoken');
+  const statusDiv = document.getElementById('uploadStatus');
+
+  try {
+    const response = await fetch('/api/upload-medical-record/', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken },
+      body: formData
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      statusDiv.innerHTML = `<small style="color:green;">${data.message}</small>`;
+      fileInput.value = '';
+    } else {
+      const error = await response.json();
+      statusDiv.innerHTML = `<small style="color:red;">Error: ${error.error || 'Upload failed'}</small>`;
+    }
+  } catch (error) {
+    statusDiv.innerHTML = `<small style="color:red;">Error: ${error.message}</small>`;
+  }
+}
+
+// Bind the form submission event
+
 
 function setProfileFieldsReadonly(readonly) {
     const fields = ['firstName', 'lastName', 'age', 'bloodGroup', 'mobile'];
@@ -633,50 +858,47 @@ function showNotification() {
     }
 }
 
-function saveProfile(e) {
-  e.preventDefault();
-  let patient = JSON.parse(localStorage.getItem('currentPatient'));
-  patient.profile = {
-    firstName: document.getElementById('firstName').value,
-    lastName: document.getElementById('lastName').value,
-    age: document.getElementById('age').value,
-    bloodGroup: document.getElementById('bloodGroup').value,
-    mobile: document.getElementById('mobile').value
-  };
-  localStorage.setItem('currentPatient', JSON.stringify(patient));
-  // Update patients array
-  let patientsArr = JSON.parse(localStorage.getItem('patients')) || [];
-  let found = patientsArr.find(p => p.email === patient.email);
-  if (found) {
-    patientsArr = patientsArr.map(p => p.email === patient.email ? patient : p);
-  } else {
-    patientsArr.push(patient);
-  }
-  localStorage.setItem('patients', JSON.stringify(patientsArr));
-  alert('Profile saved successfully!');
-  setProfileFieldsReadonly(true);
-  document.getElementById('saveProfileBtn').disabled = true;
-}
 
-function bookAppointment(e) {
-  e.preventDefault();
+
+async function bookAppointment(event) {
+  event.preventDefault();
+  // Gather form field values
+  const serviceType = document.getElementById('serviceType').value;
+  const reason = document.getElementById('reasonForVisit').value;
+  const appointmentDate = document.getElementById('appointmentDate').value;
+  const appointmentTime = document.getElementById('appointmentTime').value;
+  // Get logged in patient's email
   const patient = JSON.parse(localStorage.getItem('currentPatient'));
-  const newAppointment = {
-    patient: patient.email,
-    patientName: `${patient.profile.firstName} ${patient.profile.lastName}`|| 'Anonymous',
-    service: document.getElementById('serviceType').value,
-    reason: document.getElementById('reasonForVisit').value,
-    date: document.getElementById('appointmentDate').value,
-    time: document.getElementById('appointmentTime').value,
-    status: 'Pending'
-  };
-  appointments.push(newAppointment);
-  localStorage.setItem('appointments', JSON.stringify(appointments));
-  alert('Appointment booked successfully!');
-  e.target.reset();
-  loadPatientAppointments();
-
+  const email = patient ? patient.email : '';
+  const csrftoken = getCookie('csrftoken');
+  try {
+    const response = await fetch('/api/book-appointment/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify({
+        email: email,
+        doctor_name: serviceType,
+        reason: reason,
+        appointment_date: appointmentDate,
+        appointment_time: appointmentTime,
+      }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      alert(data.message || 'Appointment booked successfully!');
+      // Optionally reset form fields
+      event.target.reset();
+    } else {
+      throw new Error(data.error || 'Failed to book appointment');
+    }
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
 }
+ 
 function loadPatientAppointments() {
     const patient = JSON.parse(localStorage.getItem('currentPatient'));
     const patientAppointments = appointments.filter(app => app.patient === patient.email);
@@ -735,34 +957,46 @@ function cancelAppointment(index) {
     localStorage.setItem('receptionistNotifications', JSON.stringify(receptionistNotifications));
     loadPatientAppointments();
 }
-function loadReceptionistNotifications() {
-  const notifications = JSON.parse(localStorage.getItem('receptionistNotifications')) || [];
-  document.getElementById('notificationsList').innerHTML = notifications.map(note => `
-      <div class="alert alert-info">
-          <p>${note.message}</p>
-          <small>${new Date(note.timestamp).toLocaleString()}</small>
-      </div>
-  `).join('');
-}
-function handleReceptionLogin(e) {
-  e.preventDefault();
+const RECEPTION_CREDENTIALS = { username: 'admin', password: 'admin123' };
+
+async function handleReceptionLogin(event) {
+  event.preventDefault();
+  console.log('Receptionist login function triggered');
   const passkey = document.getElementById('receptionPasskey').value;
-  if (passkey !== '7874') {
-    document.getElementById('passkeyError').style.display = 'block';
-    document.getElementById('receptionCredentials').style.display = 'none';
-    return;
-  }
   const username = document.getElementById('receptionUser').value;
   const password = document.getElementById('receptionPass').value;
-
-  if (username === RECEPTION_CREDENTIALS.username && password === RECEPTION_CREDENTIALS.password) {
-    showSection('receptionDashboard');
-    loadAppointments();
-    loadReceptionistNotifications(); // Load notifications for receptionists
-  } else {
-    alert('Invalid credentials!');
+  const loginBtn = document.getElementById('receptionLoginBtn');
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = 'Logging in...';
+  try {
+      const response = await fetch('/api/reception-login/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ passkey, username, password })
+    });
+    console.log('Response status:', response.status);
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Login success data:', data);
+      alert('Receptionist logged in successfully');
+      showSection('receptionDashboard');
+      console.log('Reception login - visible dashboard:', document.querySelector('.dashboard[style*="block"]')?.id);
+      loadAppointments();
+      loadReceptionistNotifications();
+    } else {
+      const error = await response.json();
+      console.log('Login failed error:', error);
+      alert("Login failed: " + (error.error || "Unknown error"));
+    }
+  } catch (err) {
+    console.log('Error during login:', err);
+    alert("Error: " + err.message);
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = 'Login';
   }
 }
+
 // Receptionist Passkey Logic
 document.addEventListener('DOMContentLoaded', function() {
   const passkeyInput = document.getElementById('receptionPasskey');
@@ -787,9 +1021,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-
-
-function loadAppointments() {
+async function loadAppointments() {
   document.getElementById('appointmentsList').innerHTML = appointments.map((app, index) => `
     <div class="card mb-3">
       <div class="card-body">
@@ -813,7 +1045,6 @@ function loadAppointments() {
     </div>
   `).join('');
 }
-
 
 // This function is now only used for reject/cancel
 function updateAppointmentStatus(date, status) {
@@ -858,6 +1089,7 @@ function assignDoctor(index, doctorName) {
   localStorage.setItem('patients', JSON.stringify(patients));
   loadAppointments(); // Re-render to show updated doctor name
 }
+
 function showDailyAppointments() {
   const selectedDate = document.getElementById('dailyDate').value;
   const filtered = appointments.filter(app => app.date === selectedDate);
@@ -866,8 +1098,7 @@ function showDailyAppointments() {
     document.getElementById('appointmentsList').innerHTML = `<p>No appointments for selected date.</p>`;
     return;
   }
-
-  document.getElementById('appointmentsList').innerHTML = filtered.map((app, index) => `
+   document.getElementById('appointmentsList').innerHTML = filtered.map((app, index) => `
     <div class="card mb-3">
       <div class="card-body">
         <h5>${app.patientName}</h5>
@@ -920,40 +1151,12 @@ function deleteAppointment(date) {
 const MAX_FILE_SIZE_MB = 1;
 const medicalRecordForm = document.getElementById('medicalRecordForm');
 const medicalRecordFile = document.getElementById('medicalRecordFile');
-const uploadStatus = document.getElementById('uploadStatus');
-
-if (medicalRecordForm) {
-  medicalRecordForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    uploadStatus.innerText = "";
-    if (medicalRecordFile.files.length === 0) {
-      uploadStatus.innerHTML = "<span class='text-danger'>Please select a file.</span>";
-      return;
-    }
-    const file = medicalRecordFile.files[0];
-    const fileSizeMB = file.size / (1024 * 1024);
-    if (fileSizeMB > MAX_FILE_SIZE_MB) {
-      uploadStatus.innerHTML = "<span class='text-danger'>File too large! Please select a file under 1MB.</span>";
-      medicalRecordFile.value = "";
-      return;
-    }
-    // For demo: Save file name in localStorage (cannot save actual file in browser)
-    let patient = JSON.parse(localStorage.getItem('currentPatient'));
-    patient.medicalRecord = file.name; // In real apps, upload to server
-    localStorage.setItem('currentPatient', JSON.stringify(patient));
-    uploadStatus.innerHTML = "<span class='text-success'>File uploaded successfully (demo only: file name saved).</span>";
-    medicalRecordForm.reset();
-  });
-}
-
+const uploadStatus = document.getElementById('uploadStatus');                                // --- Receptionist Calendar & Add Appointment ---
 
 function logout() {
   localStorage.removeItem('currentPatient');
   showSection('introPage');
 }
-
-// Initialize
-showSection('introPage');
 
 // --- Patient notification fix ---
 function showPatientNotification() {
@@ -979,19 +1182,6 @@ function showPatientNotification() {
     }
   }
 }
-// When showing patient dashboard, always call this
-function showSection(sectionId) {
-  document.querySelectorAll('.dashboard').forEach(sec => sec.style.display = 'none');
-  document.getElementById(sectionId).style.display = 'block';
-  if (sectionId === 'patientDashboard') {
-    showPatientNotification();
-    loadPatientAppointments();
-  }
-  if (sectionId === 'receptionDashboard') {
-    renderReceptionistAppointments();
-    renderCalendar(receptionistSelectedDate);
-  }
-}
 
 document.addEventListener('DOMContentLoaded', function() {
   // Force render for receptionist dashboard in case of missed calls
@@ -1004,8 +1194,6 @@ document.addEventListener('DOMContentLoaded', function() {
 function getMonthDays(year, month) {
   return new Date(year, month + 1, 0).getDate();
 }
-let calendarYear = (new Date()).getFullYear();
-let calendarMonth = (new Date()).getMonth();
 function renderCalendar(selectedDateStr) {
   const year = calendarYear;
   const month = calendarMonth;
@@ -1061,8 +1249,6 @@ function changeCalendarYear(year) {
   renderCalendar(receptionistSelectedDate);
   renderReceptionistAppointments();
 }
-
-let receptionistSelectedDate = null;
 function renderReceptionistAppointments() {
   let filtered = appointments;
   if (receptionistSelectedDate) {
@@ -1096,40 +1282,81 @@ function renderReceptionistAppointments() {
       `;
     }).join('');
 }
+function loadReceptionistNotifications() {
+  // Fetch notifications from localStorage or use an empty array if none exist
+  let receptionistNotifications = JSON.parse(localStorage.getItem('receptionistNotifications')) || [];
+
+  // Render notifications in the UI
+  document.getElementById('notificationsList').innerHTML = receptionistNotifications.map(note => `
+    <div class="alert alert-info">
+      <p>${note.message}</p>
+      <small>${new Date(note.timestamp).toLocaleString()}</small>
+    </div>
+  `).join('');
+}
+// This code runs when an appointment is booked successfully:
+function onAppointmentBooked(patientName, serviceType, appointmentDate, appointmentTime) {
+  const newNotification = {
+    message: `New appointment booked by ${patientName} for ${serviceType} on ${appointmentDate} at ${appointmentTime}.`,
+    timestamp: new Date().toISOString()
+  };
+
+  // Fetch existing notifications
+  let receptionistNotifications = JSON.parse(localStorage.getItem('receptionistNotifications')) || [];
+
+  // Add the new notification at the start (or end)
+  receptionistNotifications.unshift(newNotification);
+
+  // Save back to localStorage
+  localStorage.setItem('receptionistNotifications', JSON.stringify(receptionistNotifications));
+
+  // Refresh UI
+  loadReceptionistNotifications();
+}
+
 
 function confirmAppointmentWithToken(index) {
-  const app = appointments[index];
-  const select = document.getElementById('tokenSelect_' + index);
-  const tokenNum = parseInt(select.value);
-  if (!tokenNum) {
-    alert('Please select a token number');
+  const tokenSelect = document.getElementById(`tokenSelect_${index}`);
+  const tokenNumber = tokenSelect.value;
+  if (!tokenNumber) {
+    alert('Please select a token number before confirming.');
     return;
   }
-  app.tokenNumber = tokenNum;
-  app.status = 'Confirmed';
+  const appointment = appointments[index];
+  appointment.tokenNumber = tokenNumber;
+  appointment.status = 'Confirmed';
   localStorage.setItem('appointments', JSON.stringify(appointments));
-  // Notify patient
+
+  // Notify the patient about the confirmed appointment with token number
   let patients = JSON.parse(localStorage.getItem('patients')) || [];
   patients = patients.map(p => {
-    if (p.email === app.patient) {
-      p.notification = `Your appointment on ${app.date} at ${app.time} has been confirmed. Your token number is ${tokenNum}.`;
+    if (p.email === appointment.patient) {
+      p.notification = `Your appointment on ${appointment.date} at ${appointment.time} has been confirmed with token number ${tokenNumber}.`;
     }
     return p;
   });
   localStorage.setItem('patients', JSON.stringify(patients));
   renderReceptionistAppointments();
 }
+
 // Show Add Appointment Modal
 function showAddAppointmentModal() {
+  console.log('Add Appointment modal - visible dashboard:', document.querySelector('.dashboard[style*="block"]')?.id);
   document.getElementById('addAppointmentModal').style.display = 'block';
+  document.getElementById('addAppointmentModal').style.zIndex = '1055'; // Optional, ensure above dashboards
   document.body.classList.add('modal-open');
+  document.getElementById('addAppointmentForm').reset();
+  document.getElementById('addAppointmentStatus').innerHTML = '';
 }
+
+// Close Add Appointment Modal
 function closeAddAppointmentModal() {
   document.getElementById('addAppointmentModal').style.display = 'none';
   document.body.classList.remove('modal-open');
   document.getElementById('addAppointmentForm').reset();
   document.getElementById('addAppointmentStatus').innerHTML = '';
 }
+
 document.getElementById('addAppointmentForm').onsubmit = function(e) {
   e.preventDefault();
   const email = document.getElementById('modalPatientEmail').value.trim();
@@ -1142,12 +1369,16 @@ document.getElementById('addAppointmentForm').onsubmit = function(e) {
   }
   // Try to get patient name from patients list
   let patientName = email;
-  if (window.patients && Array.isArray(patients)) {
-    const found = patients.find(p => p.email === email);
+  if (window.patients && Array.isArray(window.patients)) {
+    const found = window.patients.find(p => p.email === email);
     if (found && found.profile && found.profile.firstName) {
       patientName = `${found.profile.firstName} ${found.profile.lastName || ''}`.trim();
     }
   }
+
+  // Ensure appointments is initialized
+  let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+
   appointments.push({
     patient: email,
     patientName,
@@ -1157,21 +1388,40 @@ document.getElementById('addAppointmentForm').onsubmit = function(e) {
     status: 'Pending',
     doctor: ''
   });
+
   localStorage.setItem('appointments', JSON.stringify(appointments));
+
+  // Create receptionist notification
+  const newNotification = {
+    message: `New appointment booked by ${patientName} for ${service} on ${date} at ${time}.`,
+    timestamp: new Date().toISOString()
+  };
+
+  let receptionistNotifications = JSON.parse(localStorage.getItem('receptionistNotifications')) || [];
+  receptionistNotifications.unshift(newNotification);
+  localStorage.setItem('receptionistNotifications', JSON.stringify(receptionistNotifications));
+
+  // Notify UI
   document.getElementById('addAppointmentStatus').innerHTML = '<span class="text-success">Appointment added!</span>';
+
   setTimeout(() => {
     closeAddAppointmentModal();
     renderReceptionistAppointments();
     renderCalendar(receptionistSelectedDate);
+    loadReceptionistNotifications();  // Refresh notifications UI as well
   }, 800);
 };
+
 // Initial calendar and appointments
 if (document.getElementById('calendarContainer')) {
   renderCalendar(null);
   renderReceptionistAppointments();
 }
 
-
+function clearReceptionistNotifications() {
+  localStorage.removeItem('receptionistNotifications');
+  document.getElementById('notificationsList').innerHTML = '<p>No notifications.</p>';
+}
 // --- Pharmacy Section JS ---
 const serviceToMedicines = {
   "General Checkup": [
@@ -1216,7 +1466,7 @@ function renderMedicineList() {
         <div class="form-check">
           <input class="form-check-input" type="checkbox" value="${med.name}" data-price="${med.price}" id="${medId}">
           <label class="form-check-label" for="${medId}">
-            ${med.name} <span class="badge bg-info text-dark">₹${med.price}</span>
+            ${med.name} <span class="badge bg-info text-dark">â‚¹${med.price}</span>
           </label>
         </div>
       `;
@@ -1247,10 +1497,10 @@ if (pharmacyForm) {
     let orderSummary = '<ul>';
     let total = 0;
     checkedBoxes.forEach(cb => {
-      orderSummary += `<li>${cb.value} - ₹${cb.getAttribute('data-price')}</li>`;
+      orderSummary += `<li>${cb.value} - â‚¹${cb.getAttribute('data-price')}</li>`;
       total += parseInt(cb.getAttribute('data-price'));
     });
-    orderSummary += `</ul><strong>Total: ₹${total}</strong>`;
+    orderSummary += `</ul><strong>Total: â‚¹${total}</strong>`;
     document.getElementById('pharmacyOrderStatus').innerHTML =
       `<span class="text-success">Order placed! You will receive the order within 3-5 days.</span><br>${orderSummary}`;
     pharmacyForm.reset();
@@ -1458,6 +1708,15 @@ if (feedbackForm) {
 }
 
 document.addEventListener('DOMContentLoaded', renderFeedbackList);
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('verified') === '1') {
+    alert('Email verified successfully! You can now log in.');
+  }
+});
+
+document.getElementById('medicalRecordForm').addEventListener('submit', uploadMedicalRecord);
+
 </script>
 
   <div style="margin-bottom: 100px;">
